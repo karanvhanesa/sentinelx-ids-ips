@@ -1,33 +1,30 @@
-# ⬡ SentinelX — AI-Powered IDS/IPS Platform
+# SentinelX — AI-Powered IDS/IPS Platform
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-green)
 ![Docker](https://img.shields.io/badge/Docker-blue)
 ![Snort](https://img.shields.io/badge/Snort-3.0-red)
 
-## 🎯 Project Overview
+## Project Overview
 AI-Powered Intrusion Detection and Prevention System
-built during internship at Demmisto Technologies Pvt. Ltd.
+that monitors network traffic in real time,
+detects attacks using AI and Snort rules,
+and automatically blocks malicious IPs.
 
-**Intern:** Karan Vhanesa (220020107091)
-**Institution:** Ahmedabad Institute of Technology
-**Company:** Demmisto Technologies Pvt. Ltd.
-**Period:** January 2026 – March 2026
-
-## 🚀 Features
+## Features
 - Real-time network traffic monitoring
-- AI threat detection (97% accuracy)
-- Auto IP blocking via iptables
+- AI threat detection 97% accuracy
+- Auto IP blocking
 - Live SOC dashboard
 - REST API with FastAPI
 - Docker deployment
 - n8n automation alerts
 
-## 🤖 AI Models
-- Isolation Forest (anomaly detection)
-- Random Forest (attack classification)
+## AI Models
+- Isolation Forest anomaly detection
+- Random Forest attack classification
 
-## ⚙️ Tech Stack
+## Tech Stack
 | Component | Technology |
 |-----------|-----------|
 | Frontend | HTML5, Chart.js |
@@ -39,7 +36,7 @@ built during internship at Demmisto Technologies Pvt. Ltd.
 | Automation | n8n |
 | OS | Kali Linux |
 
-## 🔍 Detected Attacks
+## Detected Attacks
 - Port Scanning
 - SSH Brute Force
 - SYN Flood
@@ -47,20 +44,17 @@ built during internship at Demmisto Technologies Pvt. Ltd.
 - SQL Injection
 - DNS Tunneling
 
-## 🚀 Quick Start
-```bash
+## Quick Start
 git clone https://github.com/karanvhanesa/sentinelx-ids-ips.git
 cd sentinelx-ids-ips
 docker-compose up -d
-```
 
 Open: http://localhost:3000
 
-## 📊 API Endpoints
+## API Endpoints
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | /alerts | Get all alerts |
 | POST | /alerts | Save new alert |
 | GET | /dashboard/stats | Statistics |
 | GET | /system/health | Health check |
-

@@ -51,7 +51,7 @@ manager = Manager()
 
 @app.get("/")
 def root():
-    return {"message": "SentinelX Running", "author": "Karan Vhanesa 220020107091"}
+    return {"message": "SentinelX Running", "author": "SentinelX Platform"}
 
 @app.get("/system/health")
 def health():
