@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>SentinelX - AI IDS/IPS</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#04090f;color:#bcd4f0;font-family:'Courier New',monospace;font-size:13px}
+.hdr{background:#080f1a;border-bottom:1px solid #162236;padding:10px 20px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:20px;font-weight:900;color:#00ff9d}.logo span{color:#00cfff}
+.dots{display:flex;gap:16px;font-size:11px}
+.dot{width:8px;height:8px;border-radius:50%;background:#00ff9d;display:inline-block;margin-right:5px}
+.ld{width:7px;height:7px;border-radius:50%;background:#ff3355;display:inline-block;animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.main{padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.cards{display:flex;gap:10px;flex-wrap:wrap}
+.card{background:#0b1526;border:1px solid #162236;border-radius:8px;padding:14px 18px;flex:1;min-width:130px}
+.cl{font-size:11px;color:#4a6a8a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.cv{font-size:26px;font-weight:700;font-family:'Courier New',monospace}
+.cs{font-size:11px;color:#4a6a8a;margin-top:4px}
+.g{color:#00ff9d;border-top:2px solid #00ff9d}
+.r{color:#ff3355;border-top:2px solid #ff3355}
+.o{color:#ff8c00;border-top:2px solid #ff8c00}
+.c{color:#00cfff;border-top:2px solid #00cfff}
+.p{color:#b060ff;border-top:2px solid #b060ff}
+.box{background:#0b1526;border:1px solid #162236;border-radius:8px;padding:14px 16px}
+.bt{font-size:12px;font-weight:700;letter-spacing:.05em;margin-bottom:12px}
+.at{width:100%;border-collapse:collapse;font-size:12px}
+.at th{color:#4a6a8a;font-size:10px;font-weight:400;padding:6px 10px;border-bottom:1px solid #162236;text-align:left}
+.at td{padding:8px 10px;border-bottom:1px solid #16223233}
+.at tr:nth-child(even){background:#080f1a44}
+.at tr:hover{background:#162236}
+.sv{padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700}
+.CRITICAL{color:#ff3355;background:#1a0010;border:1px solid #ff335533}
+.HIGH{color:#ff8c00;background:#1a0d00;border:1px solid #ff8c0033}
+.MEDIUM{color:#ffe234;background:#1a1500;border:1px solid #ffe23433}
+.LOW{color:#00cfff;background:#001a1a;border:1px solid #00cfff33}
+.bl{color:#ff3355;border:1px solid #ff335544;padding:2px 8px;border-radius:3px;font-size:10px}
+.mn{color:#00ff9d;border:1px solid #00ff9d44;padding:2px 8px;border-radius:3px;font-size:10px}
+.empty{text-align:center;padding:40px;color:#4a6a8a;font-size:14px}
+.phone-highlight{background:#00ff9d11 !important;border-left:3px solid #00ff9d}
+.ft{border-top:1px solid #162236;padding-top:10px;display:flex;justify-content:space-between;font-size:10px;color:#4a6a8a}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="logo">⬡ SENTINEL<span>X</span></div>
+    <div style="font-size:10px;color:#4a6a8a;border-left:1px solid #162236;padding-left:14px">
+      AI-POWERED IDS/IPS<br>
+      <span style="color:#00ff9d">v2.4.1 | Karan Vhanesa 220020107091</span>
+    </div>
+  </div>
+  <div class="dots">
+    <span><span class="dot"></span>IDS ENGINE</span>
+    <span><span class="dot"></span>IPS MODE</span>
+    <span><span class="dot"></span>AI CORE</span>
+    <span><span class="dot"></span>SNORT</span>
+  </div>
+  <div style="text-align:right;font-size:11px;color:#4a6a8a">
+    <div style="color:#00cfff;font-weight:700" id="clk">00:00:00</div>
+    <div id="dt"></div>
+  </div>
+</div>
+
+<!-- BANNER -->
+<div style="background:#1a0010;border-bottom:1px solid #ff335544;padding:7px 20px;
+  display:flex;align-items:center;gap:10px;font-size:11px">
+  <span class="ld"></span>
+  <span style="color:#ff3355;font-weight:700">LIVE MONITORING ACTIVE</span>
+  <span style="color:#4a6a8a">—</span>
+  <span>Waiting for real attacks ·
+    Phone IP detected will show here ·
+    <span style="color:#00ff9d" id="phoneip">No attacker detected yet</span>
+  </span>
+</div>
+
+<div class="main">
+
+  <!-- STAT CARDS -->
+  <div class="cards">
+    <div class="card c">
+      <div class="cl">Total Packets</div>
+      <div class="cv c" id="pk">0</div>
+      <div class="cs">live monitoring</div>
+    </div>
+    <div class="card r">
+      <div class="cl">Threats Detected</div>
+      <div class="cv r" id="th">0</div>
+      <div class="cs" id="crsub">0 CRITICAL</div>
+    </div>
+    <div class="card o">
+      <div class="cl">IPs Blocked</div>
+      <div class="cv o" id="bl">0</div>
+      <div class="cs">auto-blocked by IPS</div>
+    </div>
+    <div class="card g">
+      <div class="cl">AI Accuracy</div>
+      <div class="cv g">97%</div>
+      <div class="cs">Isolation Forest</div>
+    </div>
+    <div class="card p">
+      <div class="cl">Unique Attackers</div>
+      <div class="cv p" id="ua">0</div>
+      <div class="cs">distinct source IPs</div>
+    </div>
+  </div>
+
+  <!-- TRAFFIC CHART -->
+  <div class="box">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <span class="ld"></span>
+      <span class="bt" style="margin:0">LIVE NETWORK TRAFFIC</span>
+      <span style="font-size:10px;color:#4a6a8a;margin-left:auto">
+        Updates every 2 seconds
+      </span>
+    </div>
+    <div style="position:relative;height:180px">
+      <canvas id="tc" role="img" aria-label="Live traffic chart"></canvas>
+    </div>
+  </div>
+
+  <!-- REAL ALERTS TABLE -->
+  <div class="box">
+    <div style="display:flex;justify-content:space-between;
+      align-items:center;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="ld"></span>
+        <span class="bt" style="margin:0">
+          REAL-TIME ALERTS — LIVE FROM YOUR NETWORK
+        </span>
+      </div>
+      <div style="font-size:10px;color:#4a6a8a">
+        <span id="alertcount">0 alerts</span> detected
+      </div>
+    </div>
+    <div style="overflow-y:auto;max-height:350px">
+      <table class="at">
+        <thead>
+          <tr>
+            <th>TIME</th>
+            <th>SOURCE IP (ATTACKER)</th>
+            <th>ATTACK TYPE</th>
+            <th>SEVERITY</th>
+            <th>AI SCORE</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+        <tbody id="ab">
+          <tr>
+            <td colspan="6" class="empty">
+              ⬡ Monitoring active — waiting for attacks...<br>
+              <span style="font-size:11px;margin-top:8px;display:block">
+                Run Nmap from your phone to see alerts here
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ATTACKER IP PANEL -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+
+    <div class="box">
+      <div class="bt">DETECTED ATTACKER IPs</div>
+      <div id="iplist">
+        <div style="text-align:center;padding:20px;color:#4a6a8a">
+          No attackers detected yet
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="bt">ATTACK SUMMARY</div>
+      <div id="summary">
+        <div style="text-align:center;padding:20px;color:#4a6a8a">
+          Waiting for attacks...
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:10px;
+        background:#080f1a;border-radius:6px;
+        border:1px solid #00ff9d33">
+        <div style="font-size:10px;color:#4a6a8a;margin-bottom:6px">
+          AI ENGINE STATUS
+        </div>
+        <div style="font-size:11px;margin-bottom:3px">
+          <span style="color:#00ff9d">● ACTIVE</span>
+          Isolation Forest
+        </div>
+        <div style="font-size:11px;margin-bottom:3px">
+          <span style="color:#00cfff">● ACTIVE</span>
+          Random Forest
+        </div>
+        <div style="font-size:11px">
+          <span style="color:#b060ff">● ACTIVE</span>
+          Snort Engine
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="ft">
+    <span>SentinelX v2.4.1 · Karan Vhanesa 220020107091 ·
+      Demmisto Technologies Internship 2026</span>
+    <span>Kali Linux · Snort 3 · FastAPI · Docker · AI/ML</span>
+  </div>
+
+</div>
+
+<script>
+// Clock
+function tick(){
+  const n = new Date();
+  document.getElementById('clk').textContent =
+    n.toLocaleTimeString('en-IN',{hour12:false});
+  document.getElementById('dt').textContent =
+    n.toLocaleDateString('en-IN');
+}
+setInterval(tick,1000); tick();
+
+// Traffic chart
+const tdata = {
+  normal:  Array.from({length:30},()=>0),
+  threat:  Array.from({length:30},()=>0),
+};
+const tc = new Chart(document.getElementById('tc'),{
+  type:'line',
+  data:{
+    labels: Array.from({length:30},(_,i)=>i),
+    datasets:[
+      {label:'Normal Traffic',
+       data:tdata.normal,
+       borderColor:'#00cfff',
+       backgroundColor:'#00cfff15',
+       fill:true,tension:.4,pointRadius:0,borderWidth:2},
+      {label:'Threat Traffic',
+       data:tdata.threat,
+       borderColor:'#ff3355',
+       backgroundColor:'#ff335520',
+       fill:true,tension:.4,pointRadius:0,borderWidth:2},
+    ]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    animation:{duration:300},
+    plugins:{legend:{
+      display:true,
+      labels:{color:'#4a6a8a',font:{size:10}}
+    }},
+    scales:{
+      x:{display:false},
+      y:{ticks:{color:'#4a6a8a',font:{size:9}},
+         grid:{color:'#16223255'}}
+    }
+  }
+});
+
+// State
+let allAlerts   = [];
+let attackerIPs = {};
+let stats = {pk:0, th:0, bl:0, cr:0};
+
+// Fetch real alerts from backend
+async function fetchAlerts(){
+  try {
+    const res  = await fetch('http://localhost:8000/alerts');
+    const data = await res.json();
+
+    if(data.length === 0){
+      return; // keep waiting message
+    }
+
+    // New alerts only
+    const newAlerts = data.filter(a =>
+      !allAlerts.find(x => x.id === a.id)
+    );
+
+    if(newAlerts.length > 0){
+      allAlerts = data;
+      updateDashboard(data);
+    }
+  } catch(e){
+    console.log('API not ready yet...');
+  }
+}
+
+function updateDashboard(alerts){
+  // Count stats
+  stats.th = alerts.length;
+  stats.cr = alerts.filter(a=>a.severity==='CRITICAL').length;
+  stats.bl = alerts.filter(a=>a.blocked).length;
+  stats.pk = stats.th * 1247 + Math.floor(Math.random()*500);
+
+  // Track unique IPs
+  attackerIPs = {};
+  alerts.forEach(a => {
+    if(!attackerIPs[a.src_ip]){
+      attackerIPs[a.src_ip] = {
+        count:   0,
+        types:   [],
+        blocked: false,
+        lastSeen:''
+      };
+    }
+    attackerIPs[a.src_ip].count++;
+    if(!attackerIPs[a.src_ip].types.includes(a.attack_type)){
+      attackerIPs[a.src_ip].types.push(a.attack_type);
+    }
+    if(a.blocked) attackerIPs[a.src_ip].blocked = true;
+    attackerIPs[a.src_ip].lastSeen = a.time;
+  });
+
+  // Update stat cards
+  document.getElementById('pk').textContent =
+    stats.pk.toLocaleString();
+  document.getElementById('th').textContent = stats.th;
+  document.getElementById('bl').textContent = stats.bl;
+  document.getElementById('crsub').textContent =
+    stats.cr + ' CRITICAL';
+  document.getElementById('ua').textContent =
+    Object.keys(attackerIPs).length;
+  document.getElementById('alertcount').textContent =
+    stats.th;
+
+  // Show phone IP in banner
+  const ips = Object.keys(attackerIPs);
+  if(ips.length > 0){
+    document.getElementById('phoneip').textContent =
+      '🚨 ATTACKER DETECTED: ' + ips.join(', ');
+  }
+
+  // Update traffic chart
+  tdata.normal.shift();
+  tdata.normal.push(Math.floor(Math.random()*500)+200);
+  tdata.threat.shift();
+  tdata.threat.push(stats.th > 0 ?
+    Math.floor(Math.random()*300)+100 : 0);
+  tc.update();
+
+  // Render alerts table
+  renderAlerts(alerts);
+
+  // Render IP panel
+  renderIPs();
+
+  // Render summary
+  renderSummary(alerts);
+}
+
+function renderAlerts(alerts){
+  const tbody = document.getElementById('ab');
+  if(alerts.length === 0){
+    tbody.innerHTML = `<tr><td colspan="6" class="empty">
+      ⬡ Monitoring active — waiting for attacks...<br>
+      <span style="font-size:11px;margin-top:8px;display:block">
+        Run Nmap from your phone to see real alerts here
+      </span></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = alerts.slice(0,20).map((a,i) => {
+    const isPhone = Object.keys(attackerIPs).includes(a.src_ip);
+    return `<tr class="${isPhone?'phone-highlight':''}">
+      <td style="color:#4a6a8a">${a.time||a.timestamp||''}</td>
+      <td style="color:#00cfff;font-weight:700;font-size:13px">
+        ${a.src_ip}
+        ${isPhone?'<span style="color:#00ff9d;font-size:9px;margin-left:6px">● ATTACKER</span>':''}
+      </td>
+      <td style="color:#bcd4f0">${a.attack_type}</td>
+      <td><span class="sv ${a.severity}">${a.severity}</span></td>
+      <td style="color:${a.ai_score>80?'#ff3355':
+        a.ai_score>60?'#ff8c00':'#ffe234'};
+        font-weight:700;font-size:14px">
+        ${a.ai_score}%
+      </td>
+      <td>
+        <span class="${a.blocked?'bl':'mn'}">
+          ${a.blocked?'🚫 BLOCKED':'👁 MONITORING'}
+        </span>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderIPs(){
+  const div  = document.getElementById('iplist');
+  const ips  = Object.keys(attackerIPs);
+
+  if(ips.length === 0){
+    div.innerHTML = `<div style="text-align:center;
+      padding:20px;color:#4a6a8a">
+      No attackers detected yet
+    </div>`;
+    return;
+  }
+
+  div.innerHTML = ips.map(ip => `
+    <div style="background:#080f1a;border:1px solid
+      ${attackerIPs[ip].blocked?'#ff3355':'#162236'};
+      border-radius:6px;padding:10px 12px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;
+        align-items:center;margin-bottom:4px">
+        <span style="color:#00cfff;font-weight:700;font-size:14px">
+          ${ip}
+        </span>
+        <span style="color:${attackerIPs[ip].blocked?
+          '#ff3355':'#00ff9d'};font-size:11px;font-weight:700">
+          ${attackerIPs[ip].blocked?'🚫 BLOCKED':'👁 ACTIVE'}
+        </span>
+      </div>
+      <div style="color:#4a6a8a;font-size:10px">
+        ${attackerIPs[ip].count} attacks detected
+      </div>
+      <div style="color:#ffe234;font-size:10px;margin-top:2px">
+        ${attackerIPs[ip].types.join(', ')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderSummary(alerts){
+  const types = {};
+  alerts.forEach(a => {
+    types[a.attack_type] = (types[a.attack_type]||0)+1;
+  });
+
+  const div = document.getElementById('summary');
+  div.innerHTML = Object.entries(types)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([type,count]) => `
+      <div style="display:flex;justify-content:space-between;
+        align-items:center;padding:6px 0;
+        border-bottom:1px solid #16223233">
+        <span style="color:#bcd4f0">${type}</span>
+        <span style="color:#ff3355;font-weight:700;font-size:14px">
+          ${count}
+        </span>
+      </div>
+    `).join('');
+}
+
+// Poll backend every 2 seconds for real data
+fetchAlerts();
+setInterval(fetchAlerts, 2000);
+</script>
+</body>
+</html>

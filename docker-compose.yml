@@ -1,0 +1,42 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: sentinelx-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    networks:
+      - sentinelx-net
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: sentinelx-ui
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    networks:
+      - sentinelx-net
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: sentinelx-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sentinelx
+      POSTGRES_USER: sentinelx
+      POSTGRES_PASSWORD: sentinelx2026
+    networks:
+      - sentinelx-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: sentinelx-redis
+    restart: unless-stopped
+    networks:
+      - sentinelx-net
+
+networks:
+  sentinelx-net:
+    driver: bridge
